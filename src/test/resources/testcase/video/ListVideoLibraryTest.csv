@@ -1,0 +1,4 @@
+caseid,description,biz_type,,exp_code,msg
+1,商品视频,0,1,
+2,店家宣传视频,1,1,
+3,非正常biztype,3,0,

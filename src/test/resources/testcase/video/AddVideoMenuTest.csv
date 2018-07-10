@@ -1,0 +1,8 @@
+caseid,description,field_id,menu_id,exp_code,msg
+1,空栏位+正确商品,0cd0e3a87df945c8829846dbb956676c,0bbc0e39dbb244c8a5463a4a9e32b9dd,1,
+2,空栏位+不存在的商品,1b329e1eb8c345c3b53ba0b7f85aaed8,1111111111111111122222222,1,服务端没有校验商品的正确性
+3,空栏位+商品id为空,40256d909d95418eb5d1209ded94527b,,1,服务端没有校验商品的正确性
+4,空栏位+已绑栏位商品,9e6572270dfe45228d2c3360aac0b2ac,0bbc0e39dbb244c8a5463a4a9e32b9dd,0,
+5,不存在栏位+正确商品,0cd0e3a87df945c8829846dbb9566761,0bbc0e39dbb244c8a5463a4a9e32b9dd,0,
+6,栏位id为空+正确商品,,0dac70262d1b478daa3f778638b38dd2,0,
+7,已绑定的栏位+正确商品,0cd0e3a87df945c8829846dbb956676c,0dac70262d1b478daa3f778638b38dd2,0,

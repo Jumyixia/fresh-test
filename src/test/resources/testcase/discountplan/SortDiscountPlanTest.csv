@@ -1,0 +1,3 @@
+caseid,description,ids_str,exp_code,msg
+1,打折方案排序-参数为空,,0,服务器异常！
+2,打折方案，前两位互换顺序,,1,null

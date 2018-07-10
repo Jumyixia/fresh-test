@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 开启注解配置 -->
+    <context:annotation-config />
+    <context:component-scan base-package="com.jum" />
+
+
+    <context:property-placeholder
+            ignore-resource-not-found="true" location="classpath:jdbc.properties" />
+
+    <!--boss druid -->
+    <bean name="bossDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          lazy-init="false" init-method="init" destroy-method="close">
+        <property name="driverClassName">
+            <value>${boss.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${boss.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${boss.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${boss.jdbc.password}</value>
+        </property>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="50" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="100" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="false" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="50" />
+        <property name="connectionInitSqls" value="set names utf8mb4" />
+    </bean>
+
+
+    <!--bps druid -->
+    <bean name="bpsDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          lazy-init="false" init-method="init" destroy-method="close">
+        <property name="driverClassName">
+            <value>${bps.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${bps.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${bps.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${bps.jdbc.password}</value>
+        </property>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="50" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="100" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="false" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="50" />
+        <property name="connectionInitSqls" value="set names utf8mb4" />
+    </bean>
+
+    <!--item druid -->
+    <bean name="itemDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          lazy-init="false" init-method="init" destroy-method="close">
+        <property name="driverClassName">
+            <value>${item.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${item.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${item.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${item.jdbc.password}</value>
+        </property>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="50" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="100" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="false" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="50" />
+        <property name="connectionInitSqls" value="set names utf8mb4" />
+    </bean>
+
+    <!--twodfire druid -->
+    <bean name="twodfireDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          lazy-init="false" init-method="init" destroy-method="close">
+        <property name="driverClassName">
+            <value>${trade_conf.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${trade_conf.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${trade_conf.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${trade_conf.jdbc.password}</value>
+        </property>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="50" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="100" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="false" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="50" />
+        <property name="connectionInitSqls" value="set names utf8mb4" />
+    </bean>
+
+</beans>

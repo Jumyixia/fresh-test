@@ -1,0 +1,7 @@
+caseid,description,field_usage_id,menu_id,exp_code,msg
+1,已存在的usageid和正确商品,2da45e6e5ef842019d33a23542004760,40d0825bf8514953ba59fdc0d124276a,1,
+2,不存在的usageid和正确商品,40256d909d95418eb5d1209ded94527b,0dac70262d1b478daa3f778638b38dd2,0,
+3,栏位id为空和正确商品,,0dac70262d1b478daa3f778638b38dd2,0,
+4,已存在的usageid和已绑定商品,60d1c7cec21a41c4ab0e6115e95ed170,71a9c31f05d74efdb9c5bc8b06752adb,0,
+5,已存在的usageid和商品为空,60d1c7cec21a41c4ab0e6115e95ed170,,0,
+6,已存在的usageid和错误商品,60d1c7cec21a41c4ab0e6115e95ed170,1112232434234,1,

@@ -1,0 +1,4 @@
+caseid,description,field_usage_id,exp_code,msg
+1,正确usageid,70b52383c2624a48b03df68b6a110835,1,
+2,不正确usageid,111111111111111111122222,0,
+3,不传usageid,,0,

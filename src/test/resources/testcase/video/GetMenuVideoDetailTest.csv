@@ -1,0 +1,5 @@
+caseid,description,menu_id,exp_code,msg
+1,添加过宣传视频,0bbc0e39dbb244c8a5463a4a9e32b9dd,1,
+2,未添加过宣传视频,71a9c31f05d74efdb9c5bc8b06752adb,1,
+3,不存在的menuid,132323423423,1,服务端未做校验
+4,不传menuid,,0,

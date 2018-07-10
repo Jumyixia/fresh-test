@@ -1,0 +1,5 @@
+caseid,description,ids_str,exp_code,msg
+1,delete-参数为空,,0,null
+2,删除打折方案id1,,1,null
+3,删除打折方案id2,,1,null
+4,删除打折方案id3,,1,null
