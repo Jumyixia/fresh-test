@@ -25,7 +25,7 @@ import java.util.Map;
 public class ListShopFieldTest extends TestBase {
     public static Logger logger = LoggerFactory.getLogger("biz");
 
-    @Test(dataProvider = "CsvDataProvider", enabled = true)
+    @Test(dataProvider = "CsvDataProvider", enabled = false)
     public void testListShopField_rouyuan(Map<String,String> data) throws Exception{
         //变量申明
         String caseid;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <bean id="cacheService" class="com.twodfire.redis.RedisSentinelService" init-method="init" destroy-method="destroy">
+        <property name="sentinels" value="common101.redis.2dfire-daily.com:26379"/>
+        <property name="masterName" value="cache101"/>
+        <property name="database" value="7"/>
+        <property name="maxTotal" value="5"/>
+    </bean>
+</beans>

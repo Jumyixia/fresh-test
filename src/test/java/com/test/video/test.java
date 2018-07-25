@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 public class test extends TestBase {
     Logger log = LoggerFactory.getLogger(com.jum.test.class);
 
-    @Test
+    @Test()
     public void test() {
         log.debug("halo_debug");
         log.info("halo_info ");

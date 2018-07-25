@@ -3,14 +3,12 @@
 <suite name="Suite" verbose="1">
 	<test name="boss-api-testing" verbose="2">
 		<packages>
-			<package name="com.test.video">
+			<package name="com.test.*">
 				<!--设置某部分case不集成执行，请误删除 -->
 				<!--<exclude name="com.test.*"></exclude>-->
 			</package>
 		</packages>
-
 	</test>
-
 
 	<listeners>
 	  <listener class-name="org.uncommons.reportng.HTMLReporter" />

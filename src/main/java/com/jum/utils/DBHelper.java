@@ -40,14 +40,15 @@ public class DBHelper {
             initConnection();
             myPreparedStatement = myConnection.prepareStatement(sql);
             myResultSet = myPreparedStatement.executeQuery(sql);
-            ResultSetMetaData rsmd = myResultSet.getMetaData();
+            ResultSetMetaData rs = myResultSet.getMetaData();
             while (myResultSet.next()) {
                 DataMap map = new DataMap();
-                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                    map.put(rsmd.getColumnLabel(i).toUpperCase(), myResultSet.getObject(i));
+                for (int i = 1; i <= rs.getColumnCount(); i++) {
+                    map.put(rs.getColumnLabel(i).toUpperCase(), myResultSet.getObject(i));
                 }
                 dataList.add(map);
             }
+            System.out.println(dataList);
         } catch (Exception ex) {
             logger.error("数据库链接异常", ex);
         } finally {

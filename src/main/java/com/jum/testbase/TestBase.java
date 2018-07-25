@@ -1,6 +1,7 @@
 package com.jum.testbase;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.dfire.soa.boss.center.tax.service.ITaxService;
 import com.jum.http.HttpRequestEx;
 import com.jum.utils.CsvDataProvider;
 import com.jum.utils.PropertiesUtil;
@@ -36,6 +37,13 @@ public class TestBase extends AbstractTestNGSpringContextTests {
 
     @Resource(name = "bpsDataSource")
     public DruidDataSource bpsDataSource;
+
+    @Resource(name = "turtleDataSource")
+    public DruidDataSource turtleDataSource;
+
+    //税费服务
+    @Resource
+    protected ITaxService taxService;
 
     @DataProvider(name = "CsvDataProvider")
     public Iterator<Object[]> data() throws Exception {

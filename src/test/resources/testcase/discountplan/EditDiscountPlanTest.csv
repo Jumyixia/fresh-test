@@ -1,5 +1,0 @@
-caseid,description,is_menu_discount,discount_plan_id,exp_code,msg
-1,edit接口参数为空,,,0,服务器异常！
-2,新增打折方案，需校验emptyUsers、KindMenuVos、simpleMenuVos,TRUE,,1,
-3,编辑打折方案-校验所有值/id1,TRUE,,1,
-4,编辑打折方案-校验所有值/id2,TRUE,,1,
