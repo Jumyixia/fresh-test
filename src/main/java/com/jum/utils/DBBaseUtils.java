@@ -17,20 +17,33 @@ public class DBBaseUtils {
     public DBBaseUtils() {
     }
 
+    /**
+     * 1. 根据csvPath，获取csv除了第一行以外的每一行值；
+     * 2. 根据tablename，获取table每一列的值信息ColumnInfo（name，dbType，size，javaType）
+     * 3. 循环csv文件的每一行，根据ColumnInfo将每一行拼装成insert语句
+     * 4. 返回所有的insert语句
+     * @param csvPath
+     * @param tableName
+     * @param excludeColumn
+     * @return
+     */
     public static List<String> getInsertSqlsWithCsv(String csvPath, String tableName, List<String> excludeColumn) {
         List<String> sqls = new ArrayList();
-        List<DataMap> ldm = CsvUtils.getFromCsv(csvPath);
-        if (CollectionUtils.isEmpty(ldm)) {
+        //根据csvPath，获取csv除了第一行以外的每一行值；
+        List<DataMap> csvdatas = CsvUtils.getFromCsv(csvPath);
+        if (CollectionUtils.isEmpty(csvdatas)) {
             logger.error("Csv file data is null or size = 0.");
             return sqls;
         } else {
-            List<ColumnInfo> insertci = getColumnInfoByExclude(tableName, excludeColumn);
+            //根据tablename，获取table每一列的值信息（name，dbType，size，javaType）
+            List<ColumnInfo> dbtableinfo = getColumnInfoByExclude(tableName, excludeColumn);
             List<String> insertSqls = new ArrayList();
-            Iterator var7 = ldm.iterator();
+            Iterator var7 = csvdatas.iterator();
 
             while(var7.hasNext()) {
-                DataMap dm = (DataMap)var7.next();
-                insertSqls.add(getInsertSqlByDM(tableName, insertci, dm));
+                DataMap csvdata = (DataMap)var7.next();
+                //循环csv文件的每一行，将每一行拼装成insert语句
+                insertSqls.add(getInsertSqlByDM(tableName, dbtableinfo, csvdata));
             }
 
             sqls.addAll(insertSqls);
@@ -38,6 +51,12 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 处理tablename，并执行sql
+     * @param tableName
+     * @param sqls
+     * @return 返回每一条sql的执行结果
+     */
     public static List<Integer> executeBatchSqls(String tableName, List<String> sqls) {
         if (CollectionUtils.isEmpty(sqls)) {
             return new ArrayList();
@@ -52,6 +71,12 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 执行sql语句
+     * @param tableName
+     * @param sqls
+     * @return
+     */
     public static List<Integer> executeBatchSqls(List<String> tableName, List<String> sqls) {
         List<Integer> result = new ArrayList();
         if (!isSizeEquals(tableName, sqls)) {
@@ -59,7 +84,7 @@ public class DBBaseUtils {
             return result;
         } else {
             for(int i = 0; i < sqls.size(); ++i) {
-                int succ = getUpdateResultMap((String)sqls.get(i), (String)tableName.get(i));
+                int succ = getUpdateResultMap((String)sqls.get(i));
                 if (succ < 0) {
                     logger.error("SQL=" + (String)sqls.get(i) + ",tableName=" + (String)tableName.get(i) + "执行失败");
                     logger.info("SQL=" + (String)sqls.get(i) + ",tableName=" + (String)tableName.get(i) + "执行失败");
@@ -74,7 +99,12 @@ public class DBBaseUtils {
         }
     }
 
-    public static int getUpdateResultMap(String sql, String tableName) {
+    /**
+     * 执行sql语句
+     * @param sql
+     * @return
+     */
+    public static int getUpdateResultMap(String sql) {
         int n = 0;
         Connection dbc = null;
         ResultSet resultSet = null;
@@ -94,12 +124,19 @@ public class DBBaseUtils {
         return n;
     }
 
+    /**
+     * 返回table里除了excludecolunm列以外的其他列的参数信息
+     * @param tableName
+     * @param excludeColumn
+     * @return
+     */
     public static List<ColumnInfo> getColumnInfoByExclude(String tableName, List<String> excludeColumn) {
         List<ColumnInfo> mainCol = new ArrayList();
         if (StringUtils.isBlank(tableName)) {
             logger.error("getColumnInfoByExclude params tableName " + tableName + ", List<String> is empty!");
             return mainCol;
         } else {
+            //table里每一列的详细参数
             List<ColumnInfo> mainColumn = getTableColumnInfo(tableName);
             mainCol.addAll(mainColumn);
             if (!CollectionUtils.isEmpty(excludeColumn)) {
@@ -116,10 +153,20 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 返回table里每一列的详细参数
+     * @param tableName
+     * @return
+     */
     public static List<ColumnInfo> getTableColumnInfo(String tableName) {
         return constructColumnInfo(getTableConfig(tableName));
     }
 
+    /**
+     * 根据table的数据库信息，提取每一列的info（name，size，dbtype，javatype）
+     * @param rsd
+     * @return
+     */
     private static List<ColumnInfo> constructColumnInfo(ResultSetMetaData rsd) {
         List<ColumnInfo> columnList = new ArrayList();
         if (rsd == null) {
@@ -143,6 +190,11 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 返回table的配置信息
+     * @param tableName
+     * @return
+     */
     private static ResultSetMetaData getTableConfig(String tableName) {
         Connection dbc = null;
         ResultSet pst = null;
@@ -185,6 +237,13 @@ public class DBBaseUtils {
 
     }
 
+    /**
+     * 拼装数据库的每一个值的dbinfo和对应csv里的值，最终返回insert语句
+     * @param tableName
+     * @param cilist
+     * @param dm
+     * @return
+     */
     private static String getInsertSqlByDM(String tableName, List<ColumnInfo> cilist, DataMap dm) {
         List<ColumnValue> lc = new ArrayList();
         Iterator var4 = cilist.iterator();
@@ -200,6 +259,13 @@ public class DBBaseUtils {
         return insertDataSQL(tableName, lc);
     }
 
+    /**
+     * 拼装数据库的每一个值的dbinfo和对应csv里的值，最终返回delete语句
+     * @param tableName
+     * @param cilist
+     * @param dm
+     * @return
+     */
     private static String getDeleteSqlByDM(String tableName, List<ColumnInfo> cilist, DataMap dm) {
         List<ColumnValue> lc = new ArrayList();
         Iterator var4 = cilist.iterator();
@@ -215,6 +281,12 @@ public class DBBaseUtils {
         return deleteDataSQL(tableName, lc);
     }
 
+    /**
+     * 根据tablename以及ColumnValue(dbinfo和csv的value) 拼装成insert语句
+     * @param tableName
+     * @param cvList
+     * @return
+     */
     public static String insertDataSQL(String tableName, List<ColumnValue> cvList) {
         if (CollectionUtils.isEmpty(cvList)) {
             logger.error("insertDataSQL params List<ColumnValue> is null or size == 0 ");
@@ -223,12 +295,13 @@ public class DBBaseUtils {
             String name = "";
             String value = "";
 
-            for(Iterator var4 = cvList.iterator(); var4.hasNext(); value = value + ",") {
+            for(Iterator var4 = cvList.iterator(); var4.hasNext(); ) {
                 ColumnValue cv = (ColumnValue)var4.next();
                 ColumnInfo col = cv.getInfo();
                 name = name + col.getName();
                 name = name + ",";
                 value = value + transformColumn(cv);
+                value = value + ",";
             }
 
             String nameStr = name.substring(0, name.length() - ",".length());
@@ -237,9 +310,16 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 根据tablename以及ColumnValue(dbinfo和csv的value) 拼装成delete语句
+     * @param tableName
+     * @param cvList
+     * @return
+     */
     public static String deleteDataSQL(String tableName, List<ColumnValue> cvList) {
         if (!StringUtils.isBlank(tableName) && !CollectionUtils.isEmpty(cvList)) {
-            String wsql = handleWhere(cvList, tableName);
+            //将ColumnValue处理成where语句
+            String wsql = handleWhere(cvList);
             return "DELETE  FROM " + tableName + wsql;
         } else {
             logger.error("deleteDataSQL params tableInfo is null , List<ColumnValue> is null or size == 0 ");
@@ -247,7 +327,12 @@ public class DBBaseUtils {
         }
     }
 
-    private static String handleWhere(List<ColumnValue> cvList, String tableName) {
+    /**
+     * 将ColumnValue处理成where语句
+     * @param cvList
+     * @return
+     */
+    private static String handleWhere(List<ColumnValue> cvList) {
         if (CollectionUtils.isEmpty(cvList)) {
             return "";
         } else {
@@ -267,6 +352,11 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 获取连接符，value为null时，返回is，不为null，则用“=”
+     * @param value
+     * @return
+     */
     private static String handleNullConnector(String value) {
         if (null != value) {
             return value.equalsIgnoreCase("NULL") ? " IS " : " = ";
@@ -275,6 +365,12 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 1. 处理csv里的“now()”、“uuid()”;
+     * 2. 处理javatype为string、Date、Timestamp类型，前后添加"'"；、处理csv值为空时，value=null
+     * @param columnValue
+     * @return
+     */
     public static String transformColumn(ColumnValue columnValue) {
         if (columnValue != null && columnValue.getValue() != null) {
             ColumnInfo columnInfo = columnValue.getInfo();
@@ -283,7 +379,7 @@ public class DBBaseUtils {
             if (value.equalsIgnoreCase("now()")) {
                 value = String.valueOf(System.currentTimeMillis());
             } else if (value.equalsIgnoreCase("uuid()")) {
-                value = String.valueOf(UUID.randomUUID());
+                value = String.valueOf(UUID.randomUUID());  //javaJDK提供的一个自动生成主键的方法
             }
 
             if ("java.lang.String".equals(JavaType)) {
@@ -321,26 +417,49 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 拼装出所有的sql语句
+     * @param csvPath
+     * @param tableName
+     * @param excludeColumn
+     * @param includeColumn
+     * @return
+     */
     public static List<String> getSqlsWithCsv(String csvPath, String tableName, List<String> excludeColumn, List<String> includeColumn) {
         return getSqlsWithDM(CsvUtils.getFromCsv(csvPath), tableName, excludeColumn, includeColumn);
     }
 
+    /**
+     * 拼装出所有的sql语句
+     * @param ldm
+     *            csv数据，csv里主要有一列“DB_OPER”=A/D来指定是insert操作还是delete操作
+     * @param tableName
+     *            表名
+     * @param excludeColumn
+     *            新增的时候排除指定字段
+     * @param includeColumn
+     *            删除的时候根据指定字段删除
+     * @return
+     */
     public static List<String> getSqlsWithDM(List<DataMap> ldm, String tableName, List<String> excludeColumn, List<String> includeColumn) {
         List<String> sqls = new ArrayList();
         if (CollectionUtils.isEmpty(ldm)) {
             logger.error("Csv file data is null or size = 0.");
             return sqls;
         } else {
+            //获取table里includeColumn列的详细参数
             List<ColumnInfo> deleteci = getColumnInfoByInclude(tableName, includeColumn);
+            //获取table里除了excludeColumn以外列的详细参数
             List<ColumnInfo> insertci = getColumnInfoByExclude(tableName, excludeColumn);
             List<String> deleteSqls = new ArrayList();
             List<String> insertSqls = new ArrayList();
-            Iterator var9 = ldm.iterator();
 
+            Iterator var9 = ldm.iterator();
             while(var9.hasNext()) {
                 DataMap dm = (DataMap)var9.next();
                 String oper = dm.getStringValue("DB_OPER");
                 if (StringUtils.isBlank(oper)) {
+                    //拼装sql语句
                     deleteSqls.add(getDeleteSqlByDM(tableName, deleteci, dm));
                     insertSqls.add(getInsertSqlByDM(tableName, insertci, dm));
                 } else if (oper.equalsIgnoreCase("A")) {
@@ -359,6 +478,12 @@ public class DBBaseUtils {
         }
     }
 
+    /**
+     * 返回table里除了includeColumn列的参数信息
+     * @param tableName
+     * @param includeColumn
+     * @return
+     */
     public static List<ColumnInfo> getColumnInfoByInclude(String tableName, List<String> includeColumn) {
         List<ColumnInfo> newCol = new ArrayList();
         if (!StringUtils.isBlank(tableName) && !CollectionUtils.isEmpty(includeColumn)) {

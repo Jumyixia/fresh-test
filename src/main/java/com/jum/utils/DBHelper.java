@@ -38,8 +38,11 @@ public class DBHelper {
                 return null;
             }
             initConnection();
+            //PreparedStatement是预编译的,对于批量处理可以大大提高效率. 也叫JDBC存储过程
             myPreparedStatement = myConnection.prepareStatement(sql);
+            //ResultSet 关于某个表的信息或一个查询的结果。
             myResultSet = myPreparedStatement.executeQuery(sql);
+            //ResultSetMetaData 有关 ResultSet 中列的名称和类型的信息。
             ResultSetMetaData rs = myResultSet.getMetaData();
             while (myResultSet.next()) {
                 DataMap map = new DataMap();
@@ -48,7 +51,6 @@ public class DBHelper {
                 }
                 dataList.add(map);
             }
-            System.out.println(dataList);
         } catch (Exception ex) {
             logger.error("数据库链接异常", ex);
         } finally {
@@ -57,7 +59,7 @@ public class DBHelper {
         return dataList;
     }
 
-    public static int executeUpdate(String sql) {
+    public static int execute(String sql) {
         int n = 0;
         try {
             initConnection();
@@ -95,19 +97,23 @@ public class DBHelper {
             return false;
         }
         String sql = "Delete from " + tableName + " where ";
-        List<String> sqls = new ArrayList<String>();
+
         for (Map.Entry<String, String> entry : conditions.entrySet()) {
-            sql = sql + entry.getKey() + " like " + "'" + entry.getValue() + "'" + " AND ";
-        }
-        sql = sql.substring(0, sql.length() - " AND ".length());
-        sqls.add(sql);
-        List<Integer> n = new ArrayList<Integer>();
-        n = DBBaseUtils.executeBatchSqls(tableName, sqls);
-        for (int i = 0; i < n.size(); i++) {
-            if (n.get(i) == -1) {
+            if (!StringUtils.isBlank(entry.getValue())) {
+                sql = sql + entry.getKey() + " like " + "'" + entry.getValue() + "'" + " AND ";
+            }else {
+                logger.error("DBData.delete params tableName is " + tableName);
                 return false;
             }
         }
+        sql = sql.substring(0, sql.length() - " AND ".length());
+
+        int n = -1;
+        n = execute(sql);
+        if (n == -1) {
+            return false;
+        }
+
         return true;
     }
 
@@ -117,37 +123,93 @@ public class DBHelper {
             return false;
         }
         String sql = "Delete from " + tableName + " where ";
-        List<String> sqls = new ArrayList<String>();
+
         for (Map.Entry<String, String> entry : conditions.entrySet()) {
-            sql = sql + entry.getKey() + "=" + "'" + entry.getValue() + "'" + " AND ";
-        }
-        sql = sql.substring(0, sql.length() - " AND ".length());
-        sqls.add(sql);
-        List<Integer> n = new ArrayList<Integer>();
-        n = DBBaseUtils.executeBatchSqls(tableName, sqls);
-        for (int i = 0; i < n.size(); i++) {
-            if (n.get(i) == -1) {
+            if (!StringUtils.isBlank(entry.getValue())) {
+                sql = sql + entry.getKey() + "=" + "'" + entry.getValue() + "'" + " AND ";
+            }else {
+                logger.error("DBData.delete params tableName is " + tableName);
                 return false;
             }
         }
+        sql = sql.substring(0, sql.length() - " AND ".length());
+
+        int n = -1;
+        n = execute(sql);
+        if (n == -1) {
+            return false;
+        }
+
         return true;
     }
 
+    /**
+     * 将csv中的数据插入数据库（需要csv里表头和数据库保持一致）
+     * 1. 根据csvPath读取csv中的数据 List<DataMap>；获取csv的表头
+     * 2. 根据tablename以及csv表头信息，读取数据库里table，将表头对应的列的columninfo（name，dbtype，size，javatype）；
+     * 3. 根据columninfo的name在DataMap中查找到columnvalue；
+     * 4. 根据columninfo的javatype 处理columnvalue；
+     * 5. 将columninfo的name以及处理后的columnvalue，拼装成insert语句
+     * 6. 执行insert语句并返回结果；
+     * 7. 校验执行结果；
+     * 8. 日志记录
+     * @param csvPath
+     *            csv文件，路径
+     * @param tableName
+     *            表名
+     * @return
+     */
+    public static boolean insert(String csvPath, String tableName){
+        try {
+            if ((StringUtils.isBlank(csvPath)) || (StringUtils.isBlank(tableName))) {
+                logger.error("DBData.insert params csvPath is " + csvPath + ", tableName is " + tableName);
+                return false;
+            }
+            List<String> excludeColumn = CsvUtils.getAllColumnName(csvPath);
+
+            return insert(csvPath, tableName, excludeColumn);
+        } catch (Exception e) {
+            logger.error("发生异常", e);
+            return false;
+        }
+    }
+
+    /**
+     * 将csv中的数据插入数据库
+     * 1. 根据csvPath读取csv中的数据 List<DataMap>；
+     * 2. 根据tablename以及excludeColumn，读取数据库里table每一列的columninfo（name，dbtype，size，javatype）；
+     * 3. 根据columninfo的name在DataMap中查找到columnvalue；
+     * 4. 根据columninfo的javatype 处理columnvalue；
+     * 5. 将columninfo的name以及处理后的columnvalue，拼装成insert语句
+     * 6. 执行insert语句并返回结果；
+     * 7. 校验执行结果；
+     * 8. 日志记录
+     * @param csvPath
+     *            csv文件，路径
+     * @param tableName
+     *            表名
+     * @param excludeColumn
+     *            新增的时候排除指定字段
+     * @return
+     */
     public static boolean insert(String csvPath, String tableName, List<String> excludeColumn) {
         try {
             if ((StringUtils.isBlank(csvPath)) || (StringUtils.isBlank(tableName))) {
                 logger.error("DBData.insert params csvPath is " + csvPath + ", tableName is " + tableName);
                 return false;
             }
+            // 得到每一行数据的insert语句
             List<String> sqls = DBBaseUtils.getInsertSqlsWithCsv(csvPath, tableName, excludeColumn);
             if (CollectionUtils.isEmpty(sqls)) {
                 logger.error("sqls为空");
                 return false;
             }
+
+            //执行所有insert语句
             List<Integer> n = new ArrayList<Integer>();
             n = DBBaseUtils.executeBatchSqls(tableName, sqls);
             for (int i = 0; i < n.size(); i++) {
-                if (n.get(i) == -1) {
+                if (n.get(i) == -1) {//校验执行结果，“-1”表示执行失败
                     return false;
                 }
             }
@@ -164,7 +226,7 @@ public class DBHelper {
     }
 
     /**
-     *
+     *  csv里主要有一列“DB_OPER”=A/D来指定是insert操作还是delete操作，
      * @param csvPath
      *            csv文件，路径
      * @param tableName
@@ -183,6 +245,7 @@ public class DBHelper {
                 logger.error("DBData.exec params are error!");
                 return false;
             }
+            //拼装出所有的sql语句
             List<String> sqls = DBBaseUtils.getSqlsWithCsv(csvPath, tableName, excludeColumn, includeColumn);
 
             List<Integer> n = new ArrayList<Integer>();
