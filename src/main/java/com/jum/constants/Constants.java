@@ -127,6 +127,7 @@ public class Constants {
 	
 	//肉圆自动化测试店
 	public static final String 	BRAND_ENTITY_ID_RY = "99932371";  //肉圆自动化测试连锁店、5000312
+	public static final String  BRAND_USERID_RY = "76182c12ceb0428d95dfcf96435bf521";
 	public static final String 	BRAND_ENTITY_ID_RY2 = "99935705";  //肉圆自动化测试连锁店2、5000302
 	public static final String 	PLATE_ENTITY_ID_RY = "99932372";  //品牌
 	public static final String 	SHOP_ENTITY_ID_RY = "99932287";  //肉圆自动化测试门店	5000311

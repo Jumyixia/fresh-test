@@ -59,7 +59,8 @@ public class HttpRequestEx {
 	}
 	
 	/**
-	 * get complete URL with htttp protocol
+	 * get complete URL with http protocol
+	 * 根据传入的path，拼装成url的路径部分，再根据query拼装成url的参数部分
 	 * @param path
 	 * @param query
 	 * @return
@@ -85,26 +86,32 @@ public class HttpRequestEx {
 		logger.info("the URL is : " + url.toString());
 		return url.toString();
 	}
-	
-	
-	private static Response processResponse(HttpResponse httpResponse) {
+
+	/**
+	 * 处理HttpResponse为Response对象
+	 * @param httpResponse
+	 * @return
+	 */
+	public static Response processResponse(HttpResponse httpResponse) {
 		Response response = null;
 		try{
-			int statusCode = httpResponse.getStatusLine().getStatusCode();			
-			HttpEntity entity = httpResponse.getEntity();
-			
+			int statusCode = httpResponse.getStatusLine().getStatusCode();	// 获取响应状态
+			//HttpEntity对象包装了服务器的响应内容
+			HttpEntity entity = httpResponse.getEntity();	// 获取响应实体
+
+			//字节数组输出流在内存中创建一个字节数组缓冲区，所有发送到输出流的数据保存在该字节数组缓冲区中
 			ByteArrayOutputStream arrayStream = new ByteArrayOutputStream();
 			byte[] buffer = new byte[1024];
-			InputStream is = entity.getContent();
+			InputStream is = entity.getContent();	//获取实体的内容流
 			
 			int len;
 			while ((len = is.read(buffer)) > 0) {
-				arrayStream.write(buffer, 0, len);
+				arrayStream.write(buffer, 0, len);// 将指定字节数组中从偏移量 off 开始的 len 个字节写入此字节数组输出流。
 			}
 			
 			String responseStr = new String(arrayStream.toByteArray(), "UTF-8");
 			is.close();
-			EntityUtils.consume(entity);
+			EntityUtils.consume(entity);	//确保完全使用实体内容，并关闭内容流（如果存在）
 						
 			logger.info(statusCode);
 			logger.info(httpResponse.getStatusLine());
@@ -116,13 +123,21 @@ public class HttpRequestEx {
 		}
 		
 		return response;
-	}	
-	
+	}
+
+	/**
+	 *
+ 	 * @param path
+	 * @param query
+	 * @param httpContent
+	 * @return
+	 * @throws IOException
+	 */
 	public Response put(List<String> path, Map<String, String> query, HttpContent httpContent) throws IOException {
 
 		HttpPut httpPut = new HttpPut(getCompleteURL(path, query));	
 		
-		if( !httpContent.httpHeaderIsValid() ){
+		if(!httpContent.httpHeaderIsValid() ){
 			logger.error("http header is invalid");
 			return null;
 		}
@@ -141,7 +156,15 @@ public class HttpRequestEx {
 		return response;
 		
 	}
-	
+
+	/**
+	 *
+	 * @param path
+	 * @param query
+	 * @param httpContent
+	 * @return
+	 * @throws IOException
+	 */
 	public Response post(List<String> path, Map<String, String> query, HttpContent httpContent) throws IOException {
 
 		HttpPost httpPost = new HttpPost(getCompleteURL(path, query));	
@@ -219,27 +242,32 @@ public class HttpRequestEx {
 	 * @param timeout
 	 * @return
 	 */
-	public static Response
-	postHandle(String url, Map<String, String> params, int timeout) {
+	public static Response postHandle(String url, Map<String, String> params, int timeout) {
 		HttpClient httpClient = null;
 		try {
 			httpClient = new DefaultHttpClient();
+			// 设置超时时间
 			initHttpClient(httpClient, timeout);
+			//建立HttpPost对象
 			HttpPost post = new HttpPost(url);
+			// 构造消息头
 			post.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 			post.addHeader("version", "sso");
 			post.addHeader("isTest", "true");
 			post.addHeader("sessionId","xxxx");
 //			post.addHeader("sessionId", params.get("sessionId"));
 			if (params != null && !params.isEmpty()) {
+				//建立一个NameValuePair数组，用于存储欲传送的参数
 				List<BasicNameValuePair> pairs = new ArrayList<BasicNameValuePair>();
 				for (Map.Entry<String, String> entry : params.entrySet()) {
 					pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue() == null ? null : entry.getValue().toString()));
 				}
 				if (!pairs.isEmpty()) {
+					//添加参数
 					post.setEntity(new UrlEncodedFormEntity(pairs, HTTP.UTF_8));
 				}
 			}
+			//发送Post,并返回一个HttpResponse对象,并处理HttpResponse为Response对象
 			Response response = processResponse(httpClient.execute(post));
 			return response;
 
@@ -257,9 +285,14 @@ public class HttpRequestEx {
 		return null;
 	}
 
+	/**
+	 * 设置请求超时时间
+	 * @param httpClient
+	 * @param timeout
+	 */
 	private static void initHttpClient(HttpClient httpClient, int timeout) {
-		httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, timeout);
-		httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,2000);
+		httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, timeout);	//HTTP连接成功后，等待读取数据或者写数据的最大超时时间，单位为毫秒;如果设置为0，则表示永远不会超时
+		httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,2000);	//HTTP连接的超时时间，单位为毫秒;如果设置为0，则表示永远不会超时
 	}
 
 	public Response postForNOS(List<String> path, Map<String, String> query, String nosAuth, String body) throws IOException {
@@ -303,6 +336,42 @@ public class HttpRequestEx {
 		
 		return response;
 		
+	}
+
+	// for NOS upload
+	public Response get(List<String> path, Map<String, String> query, Map<String, String> httpHeader) throws IOException {
+
+		HttpGet httpPost = new HttpGet(getCompleteURL(path, query));
+
+		if( httpHeader == null || httpHeader.isEmpty()){
+			logger.error("http header is invalid");
+			return null;
+		}
+
+		for(Map.Entry<String, String> entry:httpHeader.entrySet())
+			httpPost.addHeader(entry.getKey(), entry.getValue());
+
+		httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+
+
+//		if (query != null && !query.isEmpty()) {
+//			//建立一个NameValuePair数组，用于存储欲传送的参数
+//			List<BasicNameValuePair> pairs = new ArrayList<BasicNameValuePair>();
+//			for (Map.Entry<String, String> entry : query.entrySet()) {
+//				pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue() == null ? null : entry.getValue().toString()));
+//			}
+//			if (!pairs.isEmpty()) {
+//				//添加参数
+//				httpPost.setEntity(new UrlEncodedFormEntity(pairs, HTTP.UTF_8));
+//			}
+//		}
+
+		logger.info("http header is : " + httpHeader);
+
+		Response response = processResponse(httpClient.execute(httpPost));
+
+		return response;
+
 	}
 	
 	public Response post(List<String> path, Map<String, String> query, String httpBody) throws IOException {

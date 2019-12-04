@@ -88,6 +88,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.dfire.pay.center</groupId>
+            <artifactId>pay-center-client</artifactId>
+            <version>1.1.7-RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson-version}</version>
@@ -142,11 +147,11 @@
         </dependency>
         <!--日志文件管理包-->
         <!--logstart-->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>${log4j.version}</version>-->
+        <!--</dependency>-->
 
         <!--Mysql数据库链接jar包-->
         <dependency>

@@ -5,6 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <dubbo:reference interface="com.dfire.soa.boss.center.tax.service.ITaxService" id="taxService" version="1.0.0"></dubbo:reference>
+    <dubbo:reference id="taxService" interface="com.dfire.soa.boss.center.tax.service.ITaxService" version="1.0.0"></dubbo:reference>
 
+    <dubbo:reference id="entireAgreementService" interface="com.dfire.soa.boss.agreement.service.IEntireAgreementService" version="1.0.0" check="false"/>
+
+    <dubbo:reference id="alipayPaymentService" interface="com.dfire.pay.center.service.settings.IAlipayPaymentService" version="1.0.0" check="false"/>
 </beans>

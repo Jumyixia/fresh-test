@@ -1,0 +1,2 @@
+id,business_id,module_id,system_type,push_type,predict_push_time,push_scope,push_status,title,intro,rule,content_type,content,op_user_id,op_user_name,is_send,push_time,verify_code,create_time,modify_time,last_ver,is_valid
+testry0002,1,1,1,0,,2,1,20171207,20171207,"{""code"":""shopCodeChecker"",""rule"":{""shopCodes"":[""JBH""]}}",1,http://assets.2dfire.com/bmc/dev/9e1dd63730045e61ae03536a9934a66c.html,jinbuhuan@2dfire.com,金不换,true,2017-12-07 10:22:04,0938,1512613134257,1512613324075,2,true

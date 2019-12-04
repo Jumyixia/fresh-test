@@ -47,7 +47,13 @@ public class DBHelper {
             while (myResultSet.next()) {
                 DataMap map = new DataMap();
                 for (int i = 1; i <= rs.getColumnCount(); i++) {
-                    map.put(rs.getColumnLabel(i).toUpperCase(), myResultSet.getObject(i));
+                    if ("TINYINT".equals(rs.getColumnTypeName(i).toUpperCase())) {
+                        map.put(rs.getColumnLabel(i).toUpperCase(), myResultSet.getInt(i));
+                    } else if ("BIGDECIMAL".equals(rs.getColumnTypeName(i).toUpperCase())) {
+                        map.put(rs.getColumnLabel(i).toUpperCase(), myResultSet.getBigDecimal(i));
+                    } else {
+                        map.put(rs.getColumnLabel(i).toUpperCase(), myResultSet.getObject(i));
+                    }
                 }
                 dataList.add(map);
             }
@@ -101,7 +107,7 @@ public class DBHelper {
         for (Map.Entry<String, String> entry : conditions.entrySet()) {
             if (!StringUtils.isBlank(entry.getValue())) {
                 sql = sql + entry.getKey() + " like " + "'" + entry.getValue() + "'" + " AND ";
-            }else {
+            } else {
                 logger.error("DBData.delete params tableName is " + tableName);
                 return false;
             }
@@ -127,7 +133,7 @@ public class DBHelper {
         for (Map.Entry<String, String> entry : conditions.entrySet()) {
             if (!StringUtils.isBlank(entry.getValue())) {
                 sql = sql + entry.getKey() + "=" + "'" + entry.getValue() + "'" + " AND ";
-            }else {
+            } else {
                 logger.error("DBData.delete params tableName is " + tableName);
                 return false;
             }
@@ -153,13 +159,12 @@ public class DBHelper {
      * 6. 执行insert语句并返回结果；
      * 7. 校验执行结果；
      * 8. 日志记录
-     * @param csvPath
-     *            csv文件，路径
-     * @param tableName
-     *            表名
+     *
+     * @param csvPath   csv文件，路径
+     * @param tableName 表名
      * @return
      */
-    public static boolean insert(String csvPath, String tableName){
+    public static boolean insert(String csvPath, String tableName) {
         try {
             if ((StringUtils.isBlank(csvPath)) || (StringUtils.isBlank(tableName))) {
                 logger.error("DBData.insert params csvPath is " + csvPath + ", tableName is " + tableName);
@@ -184,12 +189,10 @@ public class DBHelper {
      * 6. 执行insert语句并返回结果；
      * 7. 校验执行结果；
      * 8. 日志记录
-     * @param csvPath
-     *            csv文件，路径
-     * @param tableName
-     *            表名
-     * @param excludeColumn
-     *            新增的时候排除指定字段
+     *
+     * @param csvPath       csv文件，路径
+     * @param tableName     表名
+     * @param excludeColumn 新增的时候排除指定字段
      * @return
      */
     public static boolean insert(String csvPath, String tableName, List<String> excludeColumn) {
@@ -226,15 +229,12 @@ public class DBHelper {
     }
 
     /**
-     *  csv里主要有一列“DB_OPER”=A/D来指定是insert操作还是delete操作，
-     * @param csvPath
-     *            csv文件，路径
-     * @param tableName
-     *            表名
-     * @param excludeColumn
-     *            新增的时候排除指定字段
-     * @param includeColumn
-     *            删除的时候根据指定字段删除
+     * csv里主要有一列“DB_OPER”=A/D来指定是insert操作还是delete操作，
+     *
+     * @param csvPath       csv文件，路径
+     * @param tableName     表名
+     * @param excludeColumn 新增的时候排除指定字段
+     * @param includeColumn 删除的时候根据指定字段删除
      */
     public static boolean exec(String csvPath, String tableName, List<String> excludeColumn,
                                List<String> includeColumn) {
