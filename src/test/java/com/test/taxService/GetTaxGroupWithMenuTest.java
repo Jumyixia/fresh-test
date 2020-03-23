@@ -57,7 +57,8 @@ public class GetTaxGroupWithMenuTest extends TestBase {
 
             Assert.assertEquals(model.getEntityId(), entityid, "entityid不正确");
             Assert.assertEquals(model.getGroupTax(), Integer.parseInt(dbmodel1.get("GROUP_TAX").toString()), "group_tax不正确");
-            Assert.assertEquals(model.getName(), dbmodel1.get("NAME"), "name不正确");
+            Assert.assertEquals(model.getName(), dbmodel1.get("NAME")+"1", "name不正确");
+            Assert.assertEquals(model.getName(), dbmodel1.get("NAME")+"1", "name不正确");
 
         }
     }
